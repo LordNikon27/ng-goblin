@@ -1,0 +1,369 @@
+<nz-layout class="workspace-layout">
+
+  <nz-header class="workspace-header">
+    <div class="brand">
+      <span class="brand__logo">OS</span>
+
+      <div class="brand__text">
+        <strong>OSINT Workspace</strong>
+        <span>Investigation Platform</span>
+      </div>
+    </div>
+
+    <div class="project-navigation">
+      <button nz-button nzType="primary">
+        <span nz-icon nzType="plus"></span>
+        Nuovo progetto
+      </button>
+
+      <button nz-button nzType="text">
+        <span nz-icon nzType="folder-open"></span>
+        Progetti
+      </button>
+
+      <div class="active-project">
+        <span class="active-project__label">Progetto attivo</span>
+        <strong>Nessun progetto</strong>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div
+        class="application-status"
+        [class.application-status--connecting]="
+            backendStatus() === 'connecting'
+        "
+        [class.application-status--ready]="
+            backendStatus() === 'ready'
+        "
+        [class.application-status--unavailable]="
+            backendStatus() === 'unavailable'
+        "
+        (click)="checkBackendHealth()"
+        (keydown.enter)="checkBackendHealth()"
+        (keydown.space)="checkBackendHealth(); $event.preventDefault()"
+        role="button"
+        tabindex="0">
+
+  <span class="application-status__indicator"></span>
+
+  @switch (backendStatus()) {
+    @case ('connecting') {
+      <span>Connessione...</span>
+    }
+
+    @case ('ready') {
+      <span>
+        Backend pronto
+
+        @if (backendVersion()) {
+          <small>v{{ backendVersion() }}</small>
+        }
+      </span>
+    }
+
+    @case ('unavailable') {
+      <span>Backend non raggiungibile</span>
+    }
+  }
+</div>
+
+      <button
+        nz-button
+        nzType="text"
+        nz-tooltip
+        nzTooltipTitle="Mostra o nascondi inspector"
+        (click)="toggleInspector()">
+
+        <span nz-icon nzType="layout"></span>
+      </button>
+
+      <button
+        nz-button
+        nzType="text"
+        nz-tooltip
+        nzTooltipTitle="Apri terminale"
+        (click)="toggleTerminal()">
+
+        <span nz-icon nzType="code"></span>
+      </button>
+
+      <button
+        nz-button
+        nzType="text"
+        nzShape="circle"
+        nz-tooltip
+        nzTooltipTitle="Impostazioni">
+
+        <span nz-icon nzType="setting"></span>
+      </button>
+    </div>
+  </nz-header>
+
+  <main class="workspace-main">
+    <nz-splitter
+        nzLayout="vertical"
+        [nzLazy]="false"
+        (nzResize)="onTerminalResize($event)"
+        (nzResizeEnd)="onTerminalResizeEnd($event)">
+
+      <nz-splitter-panel nzMin="300px">
+
+        <section class="graph-workspace">
+
+          <aside class="graph-toolbar">
+            <button
+              class="graph-toolbar__button graph-toolbar__button--active"
+              nz-button
+              nzType="text"
+              nz-tooltip
+              nzTooltipPlacement="right"
+              nzTooltipTitle="Seleziona">
+
+              <span nz-icon nzType="select"></span>
+            </button>
+
+            <button
+              class="graph-toolbar__button"
+              nz-button
+              nzType="text"
+              nz-tooltip
+              nzTooltipPlacement="right"
+              nzTooltipTitle="Sposta canvas">
+
+              <span nz-icon nzType="drag"></span>
+            </button>
+
+            <button
+              class="graph-toolbar__button"
+              nz-button
+              nzType="text"
+              nz-tooltip
+              nzTooltipPlacement="right"
+              nzTooltipTitle="Aggiungi nodo">
+
+              <span nz-icon nzType="plus-circle"></span>
+            </button>
+
+            <div class="graph-toolbar__separator"></div>
+
+            <button
+              class="graph-toolbar__button"
+              nz-button
+              nzType="text"
+              nz-tooltip
+              nzTooltipPlacement="right"
+              nzTooltipTitle="Centra grafico">
+
+              <span nz-icon nzType="aim"></span>
+            </button>
+
+            <button
+              class="graph-toolbar__button"
+              nz-button
+              nzType="text"
+              nz-tooltip
+              nzTooltipPlacement="right"
+              nzTooltipTitle="Riorganizza nodi">
+
+              <span nz-icon nzType="deployment-unit"></span>
+            </button>
+
+            <button
+              class="graph-toolbar__button"
+              nz-button
+              nzType="text"
+              nz-tooltip
+              nzTooltipPlacement="right"
+              nzTooltipTitle="Filtri">
+
+              <span nz-icon nzType="filter"></span>
+            </button>
+          </aside>
+
+          <nz-splitter class="graph-splitter">
+
+            <nz-splitter-panel
+              [nzDefaultSize]="inspectorVisible ? 'calc(100% - 380px)' : '100%'"
+              nzMin="500px">
+
+              <section class="graph-canvas">
+                <div class="canvas-placeholder">
+                  <div class="canvas-placeholder__icon">
+                    <span nz-icon nzType="apartment"></span>
+                  </div>
+
+                  <h1>Investigation Graph</h1>
+
+                  <p>
+                    Crea o apri un progetto per iniziare a costruire il grafo.
+                  </p>
+
+                  <button nz-button nzType="primary">
+                    <span nz-icon nzType="plus"></span>
+                    Crea il primo progetto
+                  </button>
+                </div>
+
+                <div class="canvas-controls">
+                  <button nz-button nzType="default" nzShape="circle">
+                    <span nz-icon nzType="plus"></span>
+                  </button>
+
+                  <button nz-button nzType="default" nzShape="circle">
+                    <span nz-icon nzType="minus"></span>
+                  </button>
+
+                  <button nz-button nzType="default" nzShape="circle">
+                    <span nz-icon nzType="fullscreen"></span>
+                  </button>
+                </div>
+              </section>
+
+            </nz-splitter-panel>
+
+            @if (inspectorVisible) {
+              <nz-splitter-panel
+                nzDefaultSize="380px"
+                nzMin="300px"
+                nzMax="600px">
+
+                <aside class="node-inspector">
+                  <header class="node-inspector__header">
+                    <div>
+                      <span class="eyebrow">Inspector</span>
+                      <h2>Dettagli nodo</h2>
+                    </div>
+
+                    <button
+                      nz-button
+                      nzType="text"
+                      nzShape="circle"
+                      (click)="toggleInspector()">
+
+                      <span nz-icon nzType="close"></span>
+                    </button>
+                  </header>
+
+                  <div class="node-inspector__empty">
+                    <span
+                      class="node-inspector__empty-icon"
+                      nz-icon
+                      nzType="select">
+                    </span>
+
+                    <strong>Nessun nodo selezionato</strong>
+
+                    <p>
+                      Seleziona un nodo nel grafico per visualizzare
+                      informazioni, relazioni, scansioni e azioni disponibili.
+                    </p>
+                  </div>
+                </aside>
+
+              </nz-splitter-panel>
+            }
+
+          </nz-splitter>
+
+        </section>
+
+      </nz-splitter-panel>
+
+      <nz-splitter-panel
+  [nzSize]="terminalSize"
+  [nzMin]="terminalCollapsedSize"
+  nzMax="60%">
+
+  <section
+    class="terminal"
+    [class.terminal--expanded]="terminalExpanded">
+
+    <header
+      class="terminal__header"
+      (dblclick)="toggleTerminal()">
+
+      <div class="terminal__tabs">
+        <button
+          class="terminal__tab terminal__tab--active"
+          type="button"
+          (click)="$event.stopPropagation()">
+
+          Terminale
+        </button>
+
+        <button
+          class="terminal__tab"
+          type="button"
+          (click)="$event.stopPropagation()">
+
+          Risultati
+          <span class="terminal__counter">0</span>
+        </button>
+
+        <button
+          class="terminal__tab"
+          type="button"
+          (click)="$event.stopPropagation()">
+
+          Problemi
+          <span class="terminal__counter">0</span>
+        </button>
+      </div>
+
+      <div class="terminal__status">
+        <span class="terminal__status-indicator"></span>
+
+        <span>Pronto</span>
+
+        @if (terminalExpanded) {
+          <span class="terminal__size">
+            {{ terminalSize | number:'1.0-0' }} px
+          </span>
+        }
+
+        <button
+          nz-button
+          nzType="text"
+          nzSize="small"
+          [attr.aria-label]="
+            terminalExpanded
+              ? 'Chiudi terminale'
+              : 'Apri terminale'
+          "
+          (click)="
+            $event.stopPropagation();
+            toggleTerminal()
+          ">
+
+          <span
+            nz-icon
+            [nzType]="terminalExpanded ? 'down' : 'up'">
+          </span>
+        </button>
+      </div>
+    </header>
+
+    @if (
+      terminalExpanded &&
+      terminalSize >= terminalMinimumExpandedSize
+    ) {
+      <div class="terminal__content">
+        <div class="terminal__line">
+          <span class="terminal__prompt">$</span>
+
+          <span>
+            Sistema pronto. Nessuna scansione in esecuzione.
+          </span>
+        </div>
+      </div>
+    }
+
+  </section>
+
+</nz-splitter-panel>
+
+    </nz-splitter>
+  </main>
+
+</nz-layout>
